@@ -40,7 +40,9 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+  # The format is: <dependency>-<version>@<commit>,<cabal file size>
+  - sixel-0.1.2.3@sha256:e5fe727afbe0f924de03c33a3bb604510d8c6180bf8cea13e69514fdb930ba0c,1371
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

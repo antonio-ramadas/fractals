@@ -1,6 +1,8 @@
 module Main where
 
-import Lib
+import Fractals
+import Data.Sixel (putSixel)
 
 main :: IO ()
-main = someFunc
+main = do
+    putSixel neonHouse
