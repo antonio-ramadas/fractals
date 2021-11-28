@@ -35,7 +35,7 @@ darkblue   = ( 24,   50, 194, 255)
 -- Shifts a line to start at a given point
 startLineFrom :: Point -> Line -> Line
 startLineFrom startPoint@(x0, y0) ((xS, yS), (xE, yE))
-  = (startPoint, (x0 + xE - xS, y0 + yE - yS)) 
+  = (startPoint, (x0 + xE - xS, y0 + yE - yS))
 
 -- Shifts second line to start where the first one ended
 connectLine :: Line -> Line -> Line
@@ -75,7 +75,7 @@ spiral angle scaleFactor n line
 -- Creates a _circle_ with n lines
 polygon :: Int -> Line -> Path
 polygon n line | n > 2 = spiral rotationAngle 1 (n + 1) line
-  where 
+  where
     rotationAngle = (2 * pi) / (fromIntegral n)
 
 -- Render a picture composed of coloured line paths with the specified line width.

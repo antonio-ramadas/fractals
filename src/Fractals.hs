@@ -42,3 +42,33 @@ kochFlake n line = kochLine n p1 p2
 snowflake :: Int -> Colour -> Colour -> Image PixelRGB8
 snowflake n colour backgroundColour = convertRGB8 . ImageRGBA8 $
   drawPicture 800 800 backgroundColour 3.0 [(colour, kochFlake n ((100, 225), (700, 225)))]
+
+----------------- Pythagoras tree -----------------
+fractalTree :: Float -> Int -> Line -> Path
+fractalTree factor n line = fractalTree' n line
+  where
+    fractalTree' 0 line = []  
+    fractalTree' n line 
+      = [p1, p4] ++ fractalTree' (n-1) (p4, p5) ++
+                    fractalTree' (n-1) (p5, p3) ++
+        [p3, p2] 
+      where 
+        -- flip direction of line
+        flipLine :: Line -> Line
+        flipLine (pS, pE) = (pE, pS)
+
+        -- The square: 
+        --   4------3
+        --   |      |
+        --   |      |
+        --   1------2
+        [p2,p1,p4,p3,_] = polygon 4 $ flipLine line
+        r               = flipLine (scaleLine 0.5 (p4, p3))
+        (_, p5)         = rotateLine (factor * pi) r
+
+-- Example: mapM_ putSixel [tree 0.5 340 120 n white blue | n <- [1..12]]
+-- Another: mapM_ putSixel [tree 0.6 400 120 n white blue | n <- [1..12]]
+-- Possible improvement: We could change factor every ith iteration so the trees grow a bit taller 
+tree :: Float -> Float -> Float -> Int -> Colour -> Colour -> Image PixelRGB8
+tree factor x width n color backgroundColour = convertRGB8 . ImageRGBA8 $
+    drawPicture 800 800 backgroundColour 3.0 [(color, fractalTree factor n ((x, 700), (x+width, 700)))]
