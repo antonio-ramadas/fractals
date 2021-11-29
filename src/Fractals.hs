@@ -107,3 +107,65 @@ hilbert n ((xS, yS), (xE, _)) = hilbert' n 0 0 (xE - xS) 0 0
 spaceFillingCurve :: Point -> Float -> Int -> Colour -> Colour -> Image PixelRGB8
 spaceFillingCurve (x, y) width n color backgroundColour = convertRGB8 . ImageRGBA8 $
   drawPicture 800 800 backgroundColour 3.0 [(color, hilbert n ((x,y), (x+width, y)))]
+
+----------------- T-square -----------------
+data Quadrant = Q1 | Q2 | Q3 | Q4 | None
+instance Eq Quadrant where
+  (==) Q1 Q1 = True
+  (==) Q2 Q2 = True
+  (==) Q3 Q3 = True
+  (==) Q4 Q4 = True
+  (==) None None = True
+  (==) _ _ = False
+
+tSquare :: Int -> Point -> Float -> Path
+tSquare n center side = result ++ [head result]
+  where
+    result = tSquare' n center side None
+
+    -- The quadrant indicates which corner is occupied
+    tSquare' 1 (x,y) size quadrant
+      -- The order of the points is counter-clock wise starting from the occupied quadrant
+      | quadrant == None = [(x-s, y+s), (x-s, y-s), (x+s, y-s), (x+s, y+s), (x-s, y+s)]
+      | quadrant == Q1 = [(x, y-s), (x-s, y-s), (x-s, y+s), (x+s, y+s), (x+s, y)]
+      | quadrant == Q2 = [(x-s, y), (x-s, y+s), (x+s, y+s), (x+s, y-s), (x, y-s)]
+      | quadrant == Q3 = [(x, y+s), (x+s, y+s), (x+s, y-s), (x-s, y-s), (x-s, y)]
+      | quadrant == Q4 = [(x+s, y), (x+s, y-s), (x-s, y-s), (x-s, y+s), (x, y+s)]
+      where
+        s = size / 2
+
+    tSquare' n' (x,y) size quadrant
+      | quadrant == None = fn4 ++ fn1 ++ fn2 ++ fn3
+      | quadrant == Q1 = 
+        [(x, y-s), (x-hs, y-s)] ++ fn4 ++
+        [(x-s, y-hs), (x-s, y+hs)] ++ fn1 ++ 
+        [(x-hs, y+s), (x+hs, y+s)] ++ fn2 ++
+        [(x+s, y+hs), (x+s, y)]
+      | quadrant == Q2 =
+        [(x-s, y), (x-s, y+hs)] ++ fn1 ++
+        [(x-hs, y+s), (x+hs, y+s)] ++ fn2 ++
+        [(x+s, y+hs), (x+s, y-hs)] ++ fn3 ++
+        [(x+hs, y-s), (x, y-s)]
+      | quadrant == Q3 =
+        [(x, y+s), (x+hs, y+s)] ++ fn2 ++
+        [(x+s, y+hs), (x+s, y-hs)] ++ fn3 ++
+        [(x+hs, y-s), (x-hs, y-s)] ++ fn4 ++
+        [(x-s, y-hs), (x-s, y)]
+      | quadrant == Q4 =
+        [(x+s, y), (x+s, y-hs)] ++ fn3 ++
+        [(x+hs, y-s), (x-hs, y-s)] ++ fn4 ++
+        [(x-s, y-hs), (x-s,y+hs)] ++ fn1 ++
+        [(x-hs, y+s), (x, y+s)]
+      where
+        n'' = n' - 1
+        s = size / 2
+        hs = s / 2
+        fn1 = tSquare' n'' (x-s, y+s) s Q1
+        fn2 = tSquare' n'' (x+s, y+s) s Q2
+        fn3 = tSquare' n'' (x+s, y-s) s Q3
+        fn4 = tSquare' n'' (x-s, y-s) s Q4
+
+-- Example:  mapM_ putSixel [square (400, 400) 400 n white blue | n <- [1..7]]
+square :: Point -> Float -> Int -> Colour -> Colour -> Image PixelRGB8
+square center width n color backgroundColour = convertRGB8 . ImageRGBA8 $
+  drawPicture 800 800 backgroundColour 3.0 [(color, tSquare n center width)]
