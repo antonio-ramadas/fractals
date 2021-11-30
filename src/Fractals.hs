@@ -3,20 +3,6 @@ module Fractals where
 import Codec.Picture
 import LineGraphics
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-
-house :: Path
-house = [(300, 750), (300, 450), (270, 450), (500, 200),
-                 (730, 450), (700, 450), (700, 750)]
-
-door :: Path
-door = [(420, 750), (420, 550), (580, 550), (580, 750)]
-
-neonHouse :: Image PixelRGB8
-neonHouse = convertRGB8 . ImageRGBA8 $
-               drawPicture 800 800 black 2.0 [(lightgreen, house), (red, door)]
-
 ----------------- Koch snowflake -----------------
 kochLine :: Int -> Point -> Point -> Path
 kochLine n pS pE
@@ -136,9 +122,9 @@ tSquare n center side = result ++ [head result]
 
     tSquare' n' (x,y) size quadrant
       | quadrant == None = fn4 ++ fn1 ++ fn2 ++ fn3
-      | quadrant == Q1 = 
+      | quadrant == Q1 =
         [(x, y-s), (x-hs, y-s)] ++ fn4 ++
-        [(x-s, y-hs), (x-s, y+hs)] ++ fn1 ++ 
+        [(x-s, y-hs), (x-s, y+hs)] ++ fn1 ++
         [(x-hs, y+s), (x+hs, y+s)] ++ fn2 ++
         [(x+s, y+hs), (x+s, y)]
       | quadrant == Q2 =
